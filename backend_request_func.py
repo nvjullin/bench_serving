@@ -381,8 +381,12 @@ async def async_request_dynamo_completions(
                         if not chunk_bytes:
                             continue
 
-                        chunk = chunk_bytes.decode("utf-8").removeprefix(
-                            "data: ")
+                        chunk = chunk_bytes.decode("utf-8")
+                        if chunk.startswith("data: "):
+                            chunk = chunk.removeprefix("data: ")
+                        else:
+                            continue  # ignore server response violating data-only specification
+
                         if chunk != "[DONE]":
                             data = json.loads(chunk)
 
